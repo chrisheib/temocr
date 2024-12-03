@@ -1,3 +1,9 @@
+## How to run:
+
+clone git repo, install rust, run `cargo r -r`
+
+## Kudos:
+
 rten networks from https://github.com/robertknight/ocrs/blob/main/ocrs/examples/download-models.sh
 
 DETECTION_MODEL="https://ocrs-models.s3-accelerate.amazonaws.com/text-detection.rten"
