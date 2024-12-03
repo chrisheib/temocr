@@ -46,6 +46,8 @@ fn main() -> Result<()> {
 
     let defense_type_modifier = get_defense_modifier(&attack_type_modifier);
 
+    dbg!(find_weakness(&["Water", "Nature"], &defense_type_modifier)?);
+
     // let args = parse_args()?;
 
     // Use the `download-models.sh` script to download the models.
@@ -163,10 +165,16 @@ fn main() -> Result<()> {
                         .unwrap_or_default()
             });
             if let Some(t) = tem {
-                let comtype = t["types"][0].as_str().unwrap();
+                let comtype1 = t["types"][0].as_str().unwrap();
+                let comtype2 = t["types"][1].as_str();
+                let types = if let Some(t2) = comtype2 {
+                    vec![comtype1, t2]
+                } else {
+                    vec![comtype1]
+                };
                 println!(
-                    "{line} ({comtype}), {}",
-                    find_weakness(&[comtype], &defense_type_modifier)?
+                    "{line} ({types:?}), {}",
+                    find_weakness(&types, &defense_type_modifier)?
                 );
             } else {
                 println!("{line}");
@@ -193,14 +201,30 @@ enum Types {
 }
 
 fn find_weakness(t: &[&str], weaknesses: &WeakMap) -> Result<String> {
-    let t = t.first().unwrap();
-    let t = format!(r#""{t}""#);
-    let t: Types = serde_json::from_str(&t)?;
-    let modifier = weaknesses.get(&t).unwrap();
+    let type1 = t[0];
+    let type1 = format!(r#""{type1}""#);
+    let type1: Types = serde_json::from_str(&type1)?;
+    let mut modifier = weaknesses.get(&type1).unwrap().clone();
 
-    let out: Vec<String> = modifier
+    if t.len() == 2 {
+        let type2 = t[1];
+        let type2 = format!(r#""{type2}""#);
+        let type2: Types = serde_json::from_str(&type2)?;
+        let modifier2 = weaknesses.get(&type2).unwrap();
+        for m in modifier2 {
+            *modifier.entry(*m.0).or_default() *= m.1;
+        }
+    }
+
+    let mut values = modifier
+        .into_iter()
+        .filter(|m| m.1 != 1.0)
+        .map(|v| (v.0, v.1))
+        .collect::<Vec<(Types, f32)>>();
+    values.sort_by(|a, b| b.1.total_cmp(&a.1));
+
+    let out: Vec<String> = values
         .iter()
-        .filter(|m| *m.1 != 1.0)
         .map(|m| format!("{:?}: {}", m.0, m.1))
         .collect();
 
