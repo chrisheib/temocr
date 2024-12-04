@@ -119,7 +119,11 @@ fn ocr_main_loop() -> Result<()> {
             vec![comtype1]
         };
         let w = find_weakness(&types, &defense_type_modifier)?;
-        t.extend([("type_modifier".to_string(), w.into())]);
+
+        t.extend([(
+            "type_modifier".to_string(),
+            serde_json::to_value(w).unwrap(),
+        )]);
     }
 
     dbg!(find_weakness(&["Water", "Nature"], &defense_type_modifier)?);
@@ -255,7 +259,7 @@ fn ocr_main_loop() -> Result<()> {
                     vec![comtype1]
                 };
                 println!(
-                    "{line} ({types:?}), {}",
+                    "{line} ({types:?}), {:?}",
                     find_weakness(&types, &defense_type_modifier)?
                 );
                 tems.push(t);
@@ -276,7 +280,7 @@ fn ocr_main_loop() -> Result<()> {
     }
 }
 
-#[derive(Debug, Deserialize, Hash, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, Deserialize, Hash, PartialEq, Eq, Clone, Copy, Serialize)]
 enum Types {
     Neutral,
     Wind,
@@ -292,7 +296,7 @@ enum Types {
     Toxic,
 }
 
-fn find_weakness(t: &[&str], weaknesses: &WeakMap) -> Result<String> {
+fn find_weakness(t: &[&str], weaknesses: &WeakMap) -> Result<HashMap<Types, f32>> {
     let type1 = t[0];
     let type1 = format!(r#""{type1}""#);
     let type1: Types = serde_json::from_str(&type1)?;
@@ -315,12 +319,13 @@ fn find_weakness(t: &[&str], weaknesses: &WeakMap) -> Result<String> {
         .collect::<Vec<(Types, f32)>>();
     values.sort_by(|a, b| b.1.total_cmp(&a.1));
 
-    let out: Vec<String> = values
-        .iter()
-        .map(|m| format!("{:?}: {}", m.0, m.1))
+    let out = values
+        .into_iter()
+        // .map(|m| format!("{:?}: {}", m.0, m.1))
         .collect();
 
-    Ok(out.join(", "))
+    Ok(out)
+    // Ok(out.join(", "))
 }
 
 fn get_defense_modifier(attack_modifier: &WeakMap) -> WeakMap {

@@ -18,18 +18,52 @@ async function debug_ocr() {
 }
 
 function display_tem(tem, element) {
-  element.querySelector(':scope > .name').textContent = tem.number + ' ' + tem.name;
-  element.querySelector(':scope > .type').textContent = tem.types.join();
-  element.querySelector(':scope > .modifier').textContent = tem.type_modifier;
+  element.querySelector(':scope > .name').textContent = tem.number + ' ' + tem.name
+  element.querySelector(':scope > img').src = tem.portraitWikiUrl
+  // element.querySelector(':scope > .type').textContent = tem.types.join();
+  for (let t of tem.types) {
+    let img_url = getObjectByName(window.data.types, t).icon
+    element.querySelector(':scope > .type > .icon').src = "https://raw.githubusercontent.com/maael/temtem-api/refs/heads/master/public" + img_url
+  }
+  // let x4  = []
+  // let x2  = []
+  // let x_5  = []
+  // let x_25  = []
+
+  function resetModifierColumn(element, text) {
+    element.replaceChildren()
+    let a = document.createElement('p')
+    a.innerHTML = text
+    element.appendChild(a)
+  }
+
+  resetModifierColumn(element.querySelector(':scope > .modifier > .row > .column.x4'), 'x 4')
+  resetModifierColumn(element.querySelector(':scope > .modifier > .row > .column.x2'), 'x 2')
+  resetModifierColumn(element.querySelector(':scope > .modifier > .row > .column.xhalf'), 'x 0.5')
+  resetModifierColumn(element.querySelector(':scope > .modifier > .row > .column.xquarter'), 'x 0.25')
+  
+  for (let [type, mod] of Object.entries(tem.type_modifier) ) {
+    
+    let img_url = getObjectByName(window.data.types, type).icon
+    let img = document.createElement('img');
+    img.src = "https://raw.githubusercontent.com/maael/temtem-api/refs/heads/master/public" + img_url;
+    img.width = 50
+    if (mod == 4) {
+      element.querySelector(':scope > .modifier > .row > .column.x4').appendChild(img);
+    } else if (mod == 2) {
+      element.querySelector(':scope > .modifier > .row > .column.x2').appendChild(img);
+    } else if (mod == .5) {
+      element.querySelector(':scope > .modifier > .row > .column.xhalf').appendChild(img);
+    } else if (mod == .25) {
+      element.querySelector(':scope > .modifier > .row > .column.xquarter').appendChild(img);
+    }
+  }
+  // element.querySelector(':scope > .modifier').textContent = tem.type_modifier
+}
+
+function getObjectByName(array, name) {
+  return array.find(obj => obj.name === name);
 }
 
 setInterval(debug_ocr, 1000);
 
-window.addEventListener("DOMContentLoaded", () => {
-  greetInputEl = document.querySelector("#greet-input");
-  greetMsgEl = document.querySelector("#greet-msg");
-  document.querySelector("#greet-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    greet();
-  });
-});

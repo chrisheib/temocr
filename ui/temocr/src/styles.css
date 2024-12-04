@@ -14,7 +14,11 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;  
+}
+
+img.tem_image {
+  margin-top: 10px;
 }
 
 .container {
@@ -38,8 +42,27 @@
 }
 
 .row {
+  margin-top: 10px;
   display: flex;
   justify-content: center;
+}
+
+.column {
+  background-color: rgba(0, 0, 0, 0.1); /* Slightly darker background */
+  border-radius: 10px; /* Adjust the radius as needed */
+  flex: 1; /* Equal width for each column */
+  max-width: 45%;
+  margin: 10px 10px; /* Add 10px margin on both sides */
+}
+
+.column.x4 {
+  background-color: rgba(0, 255, 0, 0.25);
+}
+.column.x2 {
+  background-color: rgba(0, 255, 0, 0.125);
+}
+.column.xhalf {
+  background-color: rgba(255, 0, 0, 0.125);
 }
 
 a {
