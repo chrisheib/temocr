@@ -1,4 +1,14 @@
+<p align="center">
+<img src="https://github.com/user-attachments/assets/6d132c3c-f817-4a12-9c37-4fa596baa267" width="600px">
+</p>
+
 ## How to run:
+
+Grab the .exe or the msi installer from the [releases](https://github.com/chrisheib/temocr/releases).
+
+You will need to disregard the Microsoft Defender notice (clicking more information -> continue anyway) because I am not rich enough to afford a Microsoft Code Signing Certificate. Sad dev noises.
+
+## Compile yourself:
 
 clone git repo, install rust, run `cargo r -r`
 
