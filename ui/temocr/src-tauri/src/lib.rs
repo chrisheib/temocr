@@ -6,8 +6,9 @@ fn greet(name: &str) -> String {
 
 #[tauri::command]
 fn get_ocr_results() -> String {
+    println!("rust: get_ocr_results called");
     let ad = get_global_var();
-    format!("{ad:?}")
+    serde_json::to_string(&ad).unwrap_or_default()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -17,6 +18,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![get_ocr_results])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -57,6 +59,7 @@ fn get_global_var() -> Appdata {
 
 static mut GLOBAL_VAR: Option<Mutex<Appdata>> = None;
 
+use std::thread;
 use std::{collections::HashMap, time::Duration};
 
 use color_eyre::Result;
@@ -74,11 +77,11 @@ use serde_json::Value;
 
 use xcap::Window;
 
-fn take_temtem_screenshot() -> ImageBuffer<Rgba<u8>, Vec<u8>> {
+fn take_temtem_screenshot() -> Option<ImageBuffer<Rgba<u8>, Vec<u8>>> {
     let windows = Window::all().unwrap();
 
     let Some(w) = windows.iter().find(|w| w.title() == "Temtem") else {
-        panic!("Temtem ist nicht offen")
+        return None;
     };
 
     // println!(
@@ -90,21 +93,34 @@ fn take_temtem_screenshot() -> ImageBuffer<Rgba<u8>, Vec<u8>> {
 
     let image = w.capture_image().unwrap();
     image.save("autoscreen.png").unwrap();
-    return image;
+    return Some(image);
 }
 type WeakMap = HashMap<Types, HashMap<Types, f32>>;
 // type WeakMap = HashMap<String, HashMap<String, f32>>;
 
 fn ocr_main_loop() -> Result<()> {
+    let wait_time = Duration::from_secs(5);
     std::env::set_var("RUST_BACKTRACE", "1");
     color_eyre::install()?;
     init_global_var();
-    let all_tems: Value =
+    let mut all_tems: Value =
         serde_json::from_str(include_str!("../data/knownTemtemSpecies.json")).unwrap();
     let attack_type_modifier: WeakMap =
         serde_json::from_str(include_str!("../data/weaknesses.json")).unwrap();
 
     let defense_type_modifier = get_defense_modifier(&attack_type_modifier);
+    for t in all_tems.as_array_mut().unwrap() {
+        let t = t.as_object_mut().unwrap();
+        let comtype1 = t["types"][0].as_str().unwrap();
+        let comtype2 = t["types"][1].as_str();
+        let types = if let Some(t2) = comtype2 {
+            vec![comtype1, t2]
+        } else {
+            vec![comtype1]
+        };
+        let w = find_weakness(&types, &defense_type_modifier)?;
+        t.extend([("type_modifier".to_string(), w.into())]);
+    }
 
     dbg!(find_weakness(&["Water", "Nature"], &defense_type_modifier)?);
 
@@ -132,7 +148,11 @@ fn ocr_main_loop() -> Result<()> {
         // Read image using image-rs library, and convert to RGB if not already
         // in that format.
         // let img = image::open("image.png").unwrap();
-        let img = take_temtem_screenshot();
+        let Some(img) = take_temtem_screenshot() else {
+            set_global_var(Appdata::default());
+            thread::sleep(wait_time);
+            continue;
+        };
 
         // Load the image from a file
         // let img = image::open("path/to/your/image.png").unwrap();
@@ -252,7 +272,7 @@ fn ocr_main_loop() -> Result<()> {
             ad.tem2 = Some(tems[1].to_owned());
         }
         set_global_var(ad);
-        std::thread::sleep(Duration::from_secs(5));
+        std::thread::sleep(wait_time);
     }
 }
 
