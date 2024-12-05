@@ -33,6 +33,7 @@ function display_tem(tem, element) {
   function resetModifierColumn(element, text) {
     element.replaceChildren()
     let a = document.createElement('p')
+    a.className = "modifier_tag"
     a.innerHTML = text
     element.appendChild(a)
   }
@@ -43,20 +44,35 @@ function display_tem(tem, element) {
   resetModifierColumn(element.querySelector(':scope > .modifier > .row > .column.xquarter'), 'x 0.25')
   
   for (let [type, mod] of Object.entries(tem.type_modifier) ) {
+
+    let thistype = getObjectByName(window.data.types, type)
     
-    let img_url = getObjectByName(window.data.types, type).icon
+    let img_url = thistype.icon
+    let img_container = document.createElement('div');
+    img_container.className = "image-container";
+    // img_container.style.backgroundColor =  thistype.color // `rgba(${thistype.color}, 0.5)` 
+    img_container.style.backgroundColor =  `rgba(${thistype.color}, 0.75)` 
+
     let img = document.createElement('img');
     img.src = "https://raw.githubusercontent.com/maael/temtem-api/refs/heads/master/public" + img_url;
     img.width = 50
+    img_container.appendChild(img)
+
+    let txt = document.createElement('p')
+    txt.className = 'text'
+    txt.innerHTML = type
+    img_container.appendChild(txt)
+
     if (mod == 4) {
-      element.querySelector(':scope > .modifier > .row > .column.x4').appendChild(img);
+      element.querySelector(':scope > .modifier > .row > .column.x4').appendChild(img_container);
     } else if (mod == 2) {
-      element.querySelector(':scope > .modifier > .row > .column.x2').appendChild(img);
+      element.querySelector(':scope > .modifier > .row > .column.x2').appendChild(img_container);
     } else if (mod == .5) {
-      element.querySelector(':scope > .modifier > .row > .column.xhalf').appendChild(img);
+      element.querySelector(':scope > .modifier > .row > .column.xhalf').appendChild(img_container);
     } else if (mod == .25) {
-      element.querySelector(':scope > .modifier > .row > .column.xquarter').appendChild(img);
+      element.querySelector(':scope > .modifier > .row > .column.xquarter').appendChild(img_container);
     }
+    // debugger
   }
   // element.querySelector(':scope > .modifier').textContent = tem.type_modifier
 }

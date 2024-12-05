@@ -30,17 +30,6 @@ img.tem_image {
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
 .row {
   margin-top: 10px;
   display: flex;
@@ -51,68 +40,34 @@ img.tem_image {
   background-color: rgba(0, 0, 0, 0.1); /* Slightly darker background */
   border-radius: 10px; /* Adjust the radius as needed */
   flex: 1; /* Equal width for each column */
-  max-width: 45%;
-  margin: 10px 10px; /* Add 10px margin on both sides */
+  margin: 10px 3px; /* Add 10px margin on both sides */
+}
+
+.column:first-child {
+  margin-left: 10px;
+}
+
+.column:last-child {
+  margin-right: 10px;
 }
 
 .column.x4 {
-  background-color: rgba(0, 255, 0, 0.25);
+  background-color: rgba(0, 255, 0, 0.3);
 }
 .column.x2 {
-  background-color: rgba(0, 255, 0, 0.125);
+  background-color: rgba(0, 255, 0, 0.2);
 }
 .column.xhalf {
-  background-color: rgba(255, 0, 0, 0.125);
+  background-color: rgba(255, 0, 0, 0.2);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+.modifier_tag {
+  background-color: rgba(255, 255, 255, 0.05); 
+  border-radius: 10px;
+  margin: 5px 5px; /* Add 10px margin on both sides */
+  padding: 1px;
 }
 
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -132,4 +87,31 @@ button {
   button:active {
     background-color: #0f0f0f69;
   }
+}
+
+.image-container {
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  margin: 3px 15px; 
+  padding: 0px 3px 3px;
+}
+
+.image-container p {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 15px; /* Adjust the height as needed */
+  bottom: 7px;
+  padding: 0px 7px;
+  text-align: center;
+  font-size: 10px;
+  margin: 0px 0px -6px;
+  background-color: rgba(10, 10, 10, 0.7);
+  border-radius: 10px;
+  height: 20px;
+  display: flex; /* Use flexbox for vertical centering */
+  align-items: center; /* Center the text vertically */
+  justify-content: center; /* Center the text horizontally (optional) */
 }
